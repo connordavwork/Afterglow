@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Afterglow: Find your next film</title>
+<meta name="description" content="Search your Letterboxd username and get film recommendations with match scores.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&display=swap">
+<style>
+:root{--bg:#f5f4ff;--card:#fff;--ink:#1c1f3a;--mute:#6b7094;--line:#e2e1f5;--acc:#5b5bd6;--accink:#fff;--hot:#f08a24;--soft:#ecebfb;--shadow:0 8px 28px rgba(60,60,140,.12);--f:"Sora",system-ui,-apple-system,"Segoe UI",sans-serif;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1226;--card:#181c3a;--ink:#eef0ff;--mute:#9aa0c8;--line:#2a2f5a;--acc:#ffb454;--accink:#1a1530;--hot:#ffb454;--soft:#222752;--shadow:0 8px 28px rgba(0,0,0,.4);color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1226;--card:#181c3a;--ink:#eef0ff;--mute:#9aa0c8;--line:#2a2f5a;--acc:#ffb454;--accink:#1a1530;--hot:#ffb454;--soft:#222752;--shadow:0 8px 28px rgba(0,0,0,.4);color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 var(--f)}
+.hero{padding:48px 18px 56px;text-align:center;background:linear-gradient(160deg,var(--soft),transparent 70%)}
+h1{font:700 clamp(2.2rem,8vw,3.2rem)/1.05 var(--f);margin:0 0 8px;letter-spacing:-.03em}
+h1 i{font-style:normal;color:var(--acc)}
+.sub{color:var(--mute);max-width:460px;margin:0 auto 22px}
+.search{display:flex;max-width:480px;margin:0 auto;background:var(--card);border-radius:999px;box-shadow:var(--shadow);padding:6px;border:1px solid var(--line)}
+.search span{padding:10px 0 0 16px;color:var(--mute)}
+.search input{flex:1;min-width:0;border:0;background:transparent;color:var(--ink);font:inherit;padding:8px 8px;outline:none}
+button{font:inherit;cursor:pointer}
+.btn{background:var(--acc);color:var(--accink);border:0;border-radius:999px;padding:10px 20px;font-weight:700}
+.btn:disabled{opacity:.5;cursor:default}
+main{max-width:860px;margin:-26px auto 0;padding:0 16px 60px;display:grid;gap:16px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:var(--shadow)}
+h2{font:700 1rem var(--f);margin:0 0 10px}
+small,.mute{color:var(--mute)}
+.acct{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.av{width:46px;height:46px;border-radius:50%;background:var(--acc);color:var(--accink);display:grid;place-items:center;font-weight:700;font-size:1.2rem}
+.acct .who{flex:1;min-width:140px}
+.ghost{background:var(--soft);color:var(--ink);border:0;border-radius:999px;padding:8px 16px;font-weight:600}
+textarea{width:100%;min-height:84px;resize:vertical;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:14px;padding:11px;font:inherit;margin-top:8px}
+textarea:focus,select:focus{outline:2px solid var(--acc)}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}
+.chip{border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:999px;padding:5px 13px;font-size:.82rem}
+.chip[aria-pressed="true"]{background:var(--acc);border-color:var(--acc);color:var(--accink)}
+select{background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:7px 12px;font:inherit}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.stat{display:flex;gap:22px;flex-wrap:wrap;margin:12px 0 6px}
+.stat b{display:block;font-size:1.3rem;color:var(--acc)}
+.fav{display:inline-block;background:var(--soft);border-radius:999px;padding:1px 10px;margin:2px;font-size:.78rem}
+.hide{display:none}
+#sum{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap}
+#out{display:grid;gap:14px}
+.rec{display:flex;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px;box-shadow:var(--shadow)}
+.poster{flex:0 0 96px;height:144px;border-radius:12px;display:flex;flex-direction:column;justify-content:flex-end;padding:8px;color:#fff;font-weight:700;font-size:.82rem;line-height:1.2;overflow:hidden}
+.poster small{color:#ffffffbb;font-weight:400}
+.body{flex:1;min-width:0}
+.top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.rec h3{margin:0;font-size:1.1rem;line-height:1.25}
+.meta{color:var(--mute);font-size:.83rem}
+.ring{flex:0 0 auto;width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--acc) calc(var(--p)*1%),var(--line) 0)}
+.ring span{width:46px;height:46px;border-radius:50%;background:var(--card);display:grid;place-items:center;font-weight:700;font-size:.82rem}
+.desc{margin:8px 0 6px}
+.why{background:var(--soft);border-radius:12px;padding:9px 12px;font-size:.88rem}
+.why b{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--acc);margin-bottom:2px}
+.tag{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:0 9px;margin:8px 5px 0 0;font-size:.72rem;color:var(--mute)}
+.rec a{color:var(--acc);font-weight:600;font-size:.84rem;display:inline-block;margin-top:8px}
+@media(max-width:480px){.poster{flex-basis:72px;height:108px;font-size:.7rem}.rec{padding:12px}}
+</style>
+</head>
+<body>
+<div class="hero">
+<h1>After<i>glow</i></h1>
+<p class="sub">Search your Letterboxd username and get films picked for your taste, each with a match score and a reason.</p>
+<form class="search" id="sf"><span>@</span><input id="uname" placeholder="your letterboxd username" autocomplete="off" aria-label="Letterboxd username"><button class="btn" id="find">Search</button></form>
+<small id="smsg" style="display:block;margin-top:10px"></small>
+</div>
+<main>
+
+<section class="panel" id="acctp">
+<div class="acct hide" id="acctrow"><div class="av" id="av">?</div>
+<div class="who"><b id="an"></b><br><small id="as"></small></div>
+</div>
+<div id="profile" class="hide"></div>
+<details style="margin-top:12px"><summary><small>Have a full Letterboxd export (ratings.csv) or no account? Other options</small></summary>
+<label class="ghost" style="display:inline-block;margin-top:10px;cursor:pointer">Choose ratings.csv / watched.csv<input id="files" type="file" accept=".csv" multiple style="display:none"></label>
+<textarea id="manual" placeholder="Or list favorites: Parasite (2019), Blade Runner 2049 (2017), Spirited Away (2001)"></textarea>
+</details>
+</section>
+
+<section class="panel">
+<h2>What are you in the mood for?</h2>
+<textarea id="prompt" style="margin-top:0" placeholder="e.g. a slow, melancholy sci-fi with great synth music, or something cozy for a rainy Sunday"></textarea>
+<div class="mute" style="margin-top:12px;font-size:.85rem">Match my favorites mainly on:</div>
+<div class="chips" id="chips"></div>
+<div class="row">
+<select id="mode"><option value="both">Blend my taste + my prompt</option><option value="taste">Only my taste</option><option value="prompt">Only my prompt</option></select>
+<select id="count"><option>6</option><option selected>8</option><option>12</option></select><small>picks</small>
+<button class="btn" id="go" style="margin-left:auto">Get recommendations</button>
+</div>
+<small id="status" style="display:block;margin-top:8px"></small>
+</section>
+
+<section class="hide" id="results">
+<div id="sum" style="margin-bottom:12px"><h2 id="sumt" style="margin:0"></h2><small>Match % is Claude’s estimate of fit, not an official score.</small></div>
+<div id="out"></div>
+</section>
+</main>
+<script>
+const ASPECTS=["Director","Genres","Themes","Visual style","Art direction","Music & score","Producers & studios","Cast","Era & country","Tone & pacing"];
+const $=id=>document.getElementById(id);
+let films=[],seen=new Set(),user="";
+const norm=s=>String(s||"").toLowerCase().replace(/[^a-z0-9]/g,"");
+const key=(n,y)=>norm(n)+(y||"");
+
+ASPECTS.forEach(a=>{const b=document.createElement("button");b.className="chip";b.type="button";b.textContent=a;b.setAttribute("aria-pressed","false");b.onclick=()=>b.setAttribute("aria-pressed",b.getAttribute("aria-pressed")==="true"?"false":"true");$("chips").appendChild(b)});
+
+$("sf").onsubmit=async e=>{
+  e.preventDefault();
+  const u=$("uname").value.trim().replace(/^@/,"");
+  if(!/^[A-Za-z0-9_-]{2,30}$/.test(u)){$("smsg").textContent="Usernames use letters, numbers, dashes and underscores.";return}
+  user=u;$("smsg").textContent="";
+  $("acctrow").classList.remove("hide");
+  $("av").textContent=u[0].toUpperCase();$("an").textContent="@"+u;$("as").textContent="Looking up your account…";
+  $("acctp").scrollIntoView({behavior:"smooth",block:"center"});
+  try{
+    const r=await fetch("/api/feed?user="+encodeURIComponent(u));const d=await r.json();
+    if(!r.ok)throw new Error(d.error||"Lookup failed.");
+    d.films.forEach(f=>{seen.add(key(f.n,f.y));if(f.r!=null)films.push(f)});
+    $("as").textContent="Connected · "+d.films.length+" recent films";renderProfile();
+  }catch(err){$("as").textContent=(err.message||"Lookup failed.")+" You can still use the options below."}
+};
+
+function parseCSV(t){const rows=[];let r=[],c="",q=false;for(let i=0;i<t.length;i++){const ch=t[i];if(q){if(ch==='"'){if(t[i+1]==='"'){c+='"';i++}else q=false}else c+=ch}else if(ch==='"')q=true;else if(ch===","){r.push(c);c=""}else if(ch==="\n"||ch==="\r"){if(ch==="\r"&&t[i+1]==="\n")i++;r.push(c);c="";if(r.length>1||r[0])rows.push(r);r=[]}else c+=ch}
+if(c||r.length){r.push(c);rows.push(r)}
+const h=(rows.shift()||[]).map(x=>x.trim());return rows.map(x=>Object.fromEntries(h.map((k,i)=>[k,x[i]])))}
+
+$("files").onchange=async e=>{
+  for(const f of e.target.files){
+    try{for(const r of parseCSV(await f.text())){if(!r.Name)continue;seen.add(key(r.Name,r.Year));if(r.Rating)films.push({n:r.Name,y:r.Year,r:parseFloat(r.Rating)})}}
+    catch(err){$("profile").textContent="Couldn’t read "+f.name}
+  }
+  renderProfile();
+};
+
+function renderProfile(){
+  const m=new Map();films.forEach(f=>m.set(key(f.n,f.y),f));films=[...m.values()];
+  const p=$("profile");p.classList.remove("hide");p.textContent="";
+  const avg=films.length?(films.reduce((a,f)=>a+f.r,0)/films.length).toFixed(2):"–";
+  const s=document.createElement("div");s.className="stat";
+  [[seen.size,"films logged"],[films.length,"rated"],[avg,"avg rating"],[films.filter(f=>f.r>=4.5).length,"rated 4.5+"]].forEach(([v,l])=>{const d=document.createElement("div");const b=document.createElement("b");b.textContent=v;d.append(b,l);s.appendChild(d)});
+  p.appendChild(s);
+  films.slice().sort((a,b)=>b.r-a.r).slice(0,10).forEach(f=>{const x=document.createElement("span");x.className="fav";x.textContent=f.n+" "+f.r+"★";p.appendChild(x)});
+}
+
+function taste(){
+  const s=films.slice().sort((a,b)=>b.r-a.r);
+  return{fav:s.filter(f=>f.r>=4).slice(0,60).map(f=>`${f.n} (${f.y}) ${f.r}`),bad:s.filter(f=>f.r<=2).slice(-15).map(f=>`${f.n} (${f.y}) ${f.r}`),manual:$("manual").value.trim()};
+}
+
+$("go").onclick=async()=>{
+  const mode=$("mode").value,prompt=$("prompt").value.trim(),t=taste(),n=$("count").value;
+  const focus=[...$("chips").children].filter(b=>b.getAttribute("aria-pressed")==="true").map(b=>b.textContent);
+  if(mode!=="prompt"&&!t.fav.length&&!t.manual&&!prompt){$("status").textContent="Connect an account, add favorites, or write a prompt first.";return}
+  if(mode==="prompt"&&!prompt){$("status").textContent="Write a prompt first.";return}
+  $("go").disabled=true;$("status").textContent="Thinking… this can take up to a minute.";
+  try{
+    const resp=await fetch("/api/recommend",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode,prompt,count:n,focus,fav:t.fav,bad:t.bad,manual:t.manual,seen:films.map(f=>`${f.n} (${f.y})`).slice(0,500)})});
+    const data=await resp.json();
+    if(!resp.ok)throw {code:data.code||"error",message:data.error};
+    let res=data.films||[];
+    res=res.filter(r=>r&&r.title&&!seen.has(key(r.title,r.year))).sort((a,b)=>(b.match||0)-(a.match||0));
+    render(res);
+    $("status").textContent=res.length?"":"No fresh picks found. Try again.";
+  }catch(e){
+    $("status").textContent=e&&e.code==="daily_limit"?e.message:e&&e.code==="rate_limited"?"Slow down a moment and retry.":"Something went wrong. Try again.";
+  }
+  $("go").disabled=false;
+};
+
+function hue(s){let h=0;for(const c of s)h=(h*31+c.charCodeAt(0))%360;return h}
+function el(t,c,x){const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
+function render(list){
+  const out=$("out");out.textContent="";
+  $("results").classList.toggle("hide",!list.length);
+  $("sumt").textContent=list.length+" picks"+(user?" for @"+user:"");
+  list.forEach(r=>{
+    const c=el("article","rec"),h=hue(r.title);
+    const po=el("div","poster");po.style.background=`linear-gradient(160deg,hsl(${h},55%,38%),hsl(${(h+55)%360},60%,18%))`;
+    po.append(el("span",null,r.title),el("small",null,r.year||""));
+    const b=el("div","body"),top=el("div","top"),tt=el("div");
+    tt.append(el("h3",null,r.title),el("div","meta",[r.year,r.director&&"dir. "+r.director].filter(Boolean).join(" · ")));
+    const m=Math.max(0,Math.min(100,Math.round(r.match||0))),ring=el("div","ring");ring.style.setProperty("--p",m);ring.title="Estimated match";ring.append(el("span",null,m+"%"));
+    top.append(tt,ring);
+    const why=el("div","why");why.append(el("b",null,"Why you might enjoy it"),document.createTextNode(r.why||""));
+    b.append(top,el("p","desc",r.description||""),why);
+    if(r.links&&r.links.length)b.append(el("div","meta","Connects to: "+r.links.join(", ")));
+    const tg=el("div");(r.tags||[]).forEach(t=>tg.appendChild(el("span","tag",t)));b.appendChild(tg);
+    const a=el("a",null,"Look it up on Letterboxd →");a.href="https://letterboxd.com/search/films/"+encodeURIComponent(r.title+" "+(r.year||""))+"/";a.target="_blank";a.rel="noopener";
+    b.appendChild(a);c.append(po,b);out.appendChild(c);
+  });
+  $("results").scrollIntoView({behavior:"smooth",block:"start"});
+}
+</script>
+</body>
+</html>
