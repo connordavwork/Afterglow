@@ -40,6 +40,4 @@ Optional: add a custom domain under the project's *Domains* settings.
 - Recommendations come from Claude's film knowledge. Match % is an estimate, and titles should be double-checked.
 
 ## Test locally (optional)
-Install Node 18+, then: `npm i -g vercel`, create `.env.local` containing `ANTHROPIC_API_KEY=...`, run `vercel dev`.   
-
-
+Install Node 18+, then: `npm i -g vercel`, create `.env.local` containing `ANTHROPIC_API_KEY=...`, run `vercel dev`.
