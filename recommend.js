@@ -59,7 +59,7 @@ Respond with ONLY a JSON array, no markdown. Each item: {"title":string,"year":n
       }),
     });
     const d = await r.json();
-    if (!r.ok) return res.status(502).json({ error: "The AI service had a problem. Try again." });
+    if (!r.ok) return res.status(502).json({ error: "AI service error: " + clip((d.error && d.error.message) || r.status, 200) });
     const text = (d.content || []).map((c) => c.text || "").join("");
     const arr = JSON.parse(text.match(/\[[\s\S]*\]/)[0]);
     const films = arr.filter((f) => f && f.title).slice(0, count).map((f) => ({
@@ -69,6 +69,6 @@ Respond with ONLY a JSON array, no markdown. Each item: {"title":string,"year":n
     }));
     res.status(200).json({ films });
   } catch (e) {
-    res.status(500).json({ error: "Couldn’t build recommendations. Try again." });
+    res.status(500).json({ error: "Couldn’t build recommendations (" + clip(e && e.message, 80) + "). Try again." });
   }
 };

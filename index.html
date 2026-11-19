@@ -227,7 +227,7 @@ $("go").onclick=async()=>{
     const res=(data.films||[]).filter(r=>!seen.has(key(r.title,r.year))).sort((a,b)=>(b.match||0)-(a.match||0));
     render(res,mode!=="taste"?prompt:"");
     $("status").textContent=res.length?"":"No fresh picks found. Try again.";
-  }catch(e){$("status").textContent=e&&e.message&&e.code==="daily_limit"?e.message:"Something went wrong. Try again in a moment."}
+  }catch(e){$("status").textContent=(e&&e.message)?e.message:"Something went wrong. Try again in a moment."}
   $("go").disabled=false;
 };
 function render(list,mood){
